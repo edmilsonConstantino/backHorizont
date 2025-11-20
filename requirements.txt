@@ -6,4 +6,5 @@ python-dotenv==1.0.0
 daphne==4.0.0
 gunicorn==22.0.0
 djangorestframework==3.14.0
+django-cors-headers==4.3.1
 
