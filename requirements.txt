@@ -4,3 +4,4 @@ channels-redis==4.1.0
 openai==1.54.0
 python-dotenv==1.0.0
 daphne==4.0.0
+gunicorn
