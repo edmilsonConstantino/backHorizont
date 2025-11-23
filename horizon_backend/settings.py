@@ -15,6 +15,7 @@ ALLOWED_HOSTS = (
 
 # Application definition
 INSTALLED_APPS = [
+    "jazzmin",
     'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -96,8 +97,7 @@ USE_TZ = True
 # Static files
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = []  # <–– ESSENCIAL PARA RENDER
-
+STATIC_ROOT = BASE_DIR / "staticfiles"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Channels
