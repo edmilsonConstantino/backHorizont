@@ -1,0 +1,24 @@
+
+body {
+    background-color: #f0f2f5;
+}
+
+
+.navbar {
+    background-color: #1e2a38;
+}
+
+.sidebar .nav-item a {
+    color: #ffffff;
+}
+
+.sidebar .nav-item a:hover {
+    background-color: #34495e;
+}
+
+.footer {
+    background-color: #1e2a38;
+    color: #ffffff;
+    text-align: center;
+    padding: 10px;
+}

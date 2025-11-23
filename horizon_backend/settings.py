@@ -104,3 +104,24 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CHANNEL_LAYERS = {
     "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"},
 }
+
+JAZZMIN_SETTINGS = {
+    "site_title": "Horizon Global Consulting Admin",
+    "site_logo": "images/logo.png",  
+    "site_header": "Horizon Global Consulting",
+    "site_brand": "Horizon GC",
+    "site_footer": "© 2025 Horizon Global Consulting. Todos os direitos reservados.",
+    "icons": {
+        "auth.User": "fas fa-user",
+        "auth.Group": "fas fa-users",
+        "mensagens.Mensagens": "fas fa-envelope",
+    },
+    "topmenu_links": [
+        {"name": "Dashboard",  "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "Mensagens",  "url": "/admin/mensagens/mensagens/", "permissions": ["mensagens.view_mensagens"]},
+    ],
+    "show_sidebar": True,
+    "theme": "darkly",  
+    "custom_css": "css/custom.css",
+    "custom_js": None,
+}
