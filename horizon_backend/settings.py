@@ -8,10 +8,8 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "insecure-default-key")
 
 DEBUG = os.environ.get("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = (
-    os.environ.get("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
-    + [".onrender.com"] + [".https://horizontt.vercel.app"]
-)
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",") + [".onrender.com", "horizontt.vercel.app"]
+
 
 # Application definition
 INSTALLED_APPS = [
@@ -96,7 +94,7 @@ USE_TZ = True
 
 # Static files
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 STATIC_ROOT = BASE_DIR / "staticfiles"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -107,7 +105,7 @@ CHANNEL_LAYERS = {
 
 JAZZMIN_SETTINGS = {
     "site_title": "Horizon Global Consulting Admin",
-    "site_logo": "images/logo.png",  
+  
     "site_header": "Horizon Global Consulting",
     "site_brand": "Horizon GC",
     "site_footer": "© 2025 Horizon Global Consulting. Todos os direitos reservados.",
