@@ -50,15 +50,13 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-# Whitenoise: só em produção
-if not DEBUG:
-    # Deve ficar logo após SecurityMiddleware
-    MIDDLEWARE.insert(
-        MIDDLEWARE.index("django.middleware.security.SecurityMiddleware") + 1,
-        "whitenoise.middleware.WhiteNoiseMiddleware"
-    )
-    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
+# Whitenoise
+MIDDLEWARE.insert(
+    MIDDLEWARE.index("django.middleware.security.SecurityMiddleware") + 1,
+    "whitenoise.middleware.WhiteNoiseMiddleware"
+)
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 # ==========================
 # URLS & TEMPLATES
 # ==========================
@@ -128,10 +126,9 @@ USE_TZ = True
 # STATIC FILES
 # ==========================
 STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"  # produção
+STATIC_ROOT = BASE_DIR / "staticfiles"  # necessário para Whitenoise
+STATICFILES_DIRS = [BASE_DIR / "static"]  # pasta que você criou para dev/Render gratuito
 
-if DEBUG:
-    STATICFILES_DIRS = [BASE_DIR / "static"]  # desenvolvimento local
 
 # ==========================
 # DEFAULT AUTO FIELD
