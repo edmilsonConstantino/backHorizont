@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
     "channels",
+
     "mensagens",
 ]
 
@@ -50,13 +51,14 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+# Whitenoise só em produção
+if not DEBUG:
+    MIDDLEWARE.insert(
+        MIDDLEWARE.index("django.middleware.security.SecurityMiddleware") + 1,
+        "whitenoise.middleware.WhiteNoiseMiddleware"
+    )
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-# Whitenoise
-MIDDLEWARE.insert(
-    MIDDLEWARE.index("django.middleware.security.SecurityMiddleware") + 1,
-    "whitenoise.middleware.WhiteNoiseMiddleware"
-)
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 # ==========================
 # URLS & TEMPLATES
 # ==========================
@@ -126,9 +128,11 @@ USE_TZ = True
 # STATIC FILES
 # ==========================
 STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"  # necessário para Whitenoise
-STATICFILES_DIRS = [BASE_DIR / "static"]  # pasta que você criou para dev/Render gratuito
+STATIC_ROOT = BASE_DIR / "staticfiles"  # pasta com todos os arquivos estáticos já no repositório
 
+# No DEBUG, usamos STATICFILES_DIRS para dev local, mas no Render gratuito deixamos vazio
+if DEBUG:
+    STATICFILES_DIRS = [BASE_DIR / "static"]
 
 # ==========================
 # DEFAULT AUTO FIELD
