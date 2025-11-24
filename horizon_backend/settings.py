@@ -2,13 +2,10 @@
 import os
 from pathlib import Path
 
-# ==========================
-# BASE & SECRET
-# ==========================
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "insecure-default-key")
 
-# Em produção no Render, DEBUG deve ser False
 
 DEBUG = os.environ.get("DEBUG", "False") == "True"
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS")
@@ -18,11 +15,8 @@ else:
     ALLOWED_HOSTS = ["localhost", "127.0.0.1", ".onrender.com", "horizontt.vercel.app"]
 
 
-# ==========================
-# APPS
-# ==========================
+
 INSTALLED_APPS = [
-    "jazzmin",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -59,9 +53,7 @@ if not DEBUG:
     )
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-# ==========================
-# URLS & TEMPLATES
-# ==========================
+
 ROOT_URLCONF = "horizon_backend.urls"
 
 TEMPLATES = [
@@ -144,27 +136,4 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # ==========================
 CHANNEL_LAYERS = {
     "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"},
-}
-
-# ==========================
-# JAZZMIN
-# ==========================
-JAZZMIN_SETTINGS = {
-    "site_title": "Horizon Global Consulting Admin",
-    "site_header": "Horizon Global Consulting",
-    "site_brand": "Horizon GC",
-    "site_footer": "© 2025 Horizon Global Consulting. Todos os direitos reservados.",
-    "icons": {
-        "auth.User": "fas fa-user",
-        "auth.Group": "fas fa-users",
-        "mensagens.Mensagens": "fas fa-envelope",
-    },
-    "topmenu_links": [
-        {"name": "Dashboard", "url": "admin:index", "permissions": ["auth.view_user"]},
-        {"name": "Mensagens", "url": "/admin/mensagens/mensagens/", "permissions": ["mensagens.view_mensagens"]},
-    ],
-    "show_sidebar": True,
-    "theme": "darkly",
-    "custom_css": "css/custom.css",
-    "custom_js": None,
 }
