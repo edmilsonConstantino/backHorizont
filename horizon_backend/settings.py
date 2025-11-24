@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "insecure-default-key")
 
 # Em produção no Render, DEBUG deve ser False
-DEBUG = os.environ.get("DEBUG", "True") == "True"
+DEBUG = os.environ.get("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = [
     "localhost",
@@ -33,7 +33,6 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
     "channels",
-
     "mensagens",
 ]
 
@@ -53,7 +52,7 @@ MIDDLEWARE = [
 
 # Whitenoise: só em produção
 if not DEBUG:
-    # logo após SecurityMiddleware
+    # Deve ficar logo após SecurityMiddleware
     MIDDLEWARE.insert(
         MIDDLEWARE.index("django.middleware.security.SecurityMiddleware") + 1,
         "whitenoise.middleware.WhiteNoiseMiddleware"
@@ -130,6 +129,7 @@ USE_TZ = True
 # ==========================
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"  # produção
+
 if DEBUG:
     STATICFILES_DIRS = [BASE_DIR / "static"]  # desenvolvimento local
 
