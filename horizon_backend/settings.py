@@ -9,14 +9,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "insecure-default-key")
 
 # Em produção no Render, DEBUG deve ser False
-DEBUG = os.environ.get("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = [
-    "localhost",
-    "127.0.0.1",
-    ".onrender.com",
-    "horizontt.vercel.app",
-]
+DEBUG = os.environ.get("DEBUG", "False") == "True"
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS")
+if ALLOWED_HOSTS:
+    ALLOWED_HOSTS = [h.strip() for h in ALLOWED_HOSTS.split(",")]
+else:
+    ALLOWED_HOSTS = ["localhost", "127.0.0.1", ".onrender.com", "horizontt.vercel.app"]
+
 
 # ==========================
 # APPS
