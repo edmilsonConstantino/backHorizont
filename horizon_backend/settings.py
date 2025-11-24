@@ -1,10 +1,14 @@
+# horizon_backend/settings.py
 import os
 from pathlib import Path
 
+# ==========================
+# BASE & SECRET
+# ==========================
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "insecure-default-key")
 
+# Em produção no Render, DEBUG deve ser False
 DEBUG = os.environ.get("DEBUG", "True") == "True"
 
 ALLOWED_HOSTS = [
@@ -14,6 +18,9 @@ ALLOWED_HOSTS = [
     "horizontt.vercel.app",
 ]
 
+# ==========================
+# APPS
+# ==========================
 INSTALLED_APPS = [
     "jazzmin",
     "django.contrib.admin",
@@ -22,12 +29,17 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
     "rest_framework",
     "corsheaders",
     "channels",
+
     "mensagens",
 ]
 
+# ==========================
+# MIDDLEWARE
+# ==========================
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
@@ -39,14 +51,18 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-# Whitenoise só em produção
+# Whitenoise: só em produção
 if not DEBUG:
+    # logo após SecurityMiddleware
     MIDDLEWARE.insert(
         MIDDLEWARE.index("django.middleware.security.SecurityMiddleware") + 1,
-        "whitenoise.middleware.WhiteNoiseMiddleware",
+        "whitenoise.middleware.WhiteNoiseMiddleware"
     )
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
+# ==========================
+# URLS & TEMPLATES
+# ==========================
 ROOT_URLCONF = "horizon_backend.urls"
 
 TEMPLATES = [
@@ -67,6 +83,9 @@ TEMPLATES = [
 
 ASGI_APPLICATION = "horizon_backend.asgi.application"
 
+# ==========================
+# DATABASE
+# ==========================
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
@@ -74,17 +93,23 @@ DATABASES = {
     }
 }
 
+# ==========================
 # CORS
+# ==========================
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
+# ==========================
 # REST Framework
+# ==========================
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.AllowAny"],
     "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
 }
 
-# Password validation
+# ==========================
+# PASSWORD VALIDATION
+# ==========================
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
@@ -92,25 +117,37 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
+# ==========================
+# INTERNATIONALIZATION
+# ==========================
 LANGUAGE_CODE = "pt-br"
 TIME_ZONE = "Africa/Maputo"
 USE_I18N = True
 USE_TZ = True
 
-# Static files
+# ==========================
+# STATIC FILES
+# ==========================
 STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_ROOT = BASE_DIR / "staticfiles"  # produção
 if DEBUG:
-    STATICFILES_DIRS = [BASE_DIR / "static"]
+    STATICFILES_DIRS = [BASE_DIR / "static"]  # desenvolvimento local
 
+# ==========================
+# DEFAULT AUTO FIELD
+# ==========================
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Channels
+# ==========================
+# CHANNELS
+# ==========================
 CHANNEL_LAYERS = {
     "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"},
 }
 
-# Jazzmin
+# ==========================
+# JAZZMIN
+# ==========================
 JAZZMIN_SETTINGS = {
     "site_title": "Horizon Global Consulting Admin",
     "site_header": "Horizon Global Consulting",
