@@ -6,15 +6,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "insecure-default-key")
 
-DEBUG = os.environ.get("DEBUG", "False") == "True"
+DEBUG = os.environ.get("DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",") + [".onrender.com", "horizontt.vercel.app"]
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    ".onrender.com",
+    "horizontt.vercel.app"
+]
 
 
 # Application definition
 INSTALLED_APPS = [
     "jazzmin",
-    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -94,9 +98,17 @@ USE_I18N = True
 USE_TZ = True
 
 # Static files
-STATIC_URL = '/static/'
-
+STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_DIRS = [BASE_DIR / "static"] 
+
+if not DEBUG:
+    MIDDLEWARE.insert(
+        MIDDLEWARE.index("django.middleware.security.SecurityMiddleware") + 1,
+        "whitenoise.middleware.WhiteNoiseMiddleware"
+    )
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Channels
