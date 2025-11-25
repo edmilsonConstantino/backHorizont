@@ -3,15 +3,17 @@ import os
 from dotenv import load_dotenv
 from channels.generic.websocket import AsyncWebsocketConsumer
 import httpx
+import traceback
 
 load_dotenv()
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         await self.accept()
+        print("✅ WebSocket conectado")
 
     async def disconnect(self, close_code):
-        pass
+        print(f"🔌 WebSocket desconectado: {close_code}")
 
     async def receive(self, text_data):
         try:
@@ -40,7 +42,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
             api_key = os.environ.get("OPENROUTER_API_KEY")
             if not api_key:
-                raise ValueError("OPENROUTER_API_KEY não configurada")
+                print("❌ ERRO: OPENROUTER_API_KEY não está configurada!")
+                await self.send(json.dumps({
+                    "event": "error",
+                    "message": "Configuração ausente. Entre em contato conosco."
+                }))
+                await self.send(json.dumps({"event": "typing", "status": False}))
+                return
 
             system_prompt = """Você é o Assistente Virtual Oficial da Horizon Global Consulting, Lda - a principal empresa de consultoria empresarial em Moçambique.
 
@@ -57,12 +65,12 @@ Fornecer soluções estratégicas e inovadoras em gestão empresarial, ajudando 
 Ser reconhecida como referência em consultoria e gestão empresarial em Moçambique e internacionalmente, impulsionando a transformação digital e a eficiência organizacional por meio de soluções inovadoras e estratégicas.
 
 💎 VALORES CORE:
-• Excelência – Compromisso com qualidade e entrega de soluções eficientes e inovadoras
-• Ética e Transparência – Integridade e conformidade nas relações empresariais
-• Inovação – Busca contínua por tecnologias e estratégias modernas
-• Compromisso com o Cliente – Foco em entender e atender necessidades específicas
-• Sustentabilidade – Promoção de práticas empresariais responsáveis
-• Desenvolvimento e Crescimento – Valorização do conhecimento e aprimoramento profissional
+- Excelência – Compromisso com qualidade e entrega de soluções eficientes e inovadoras
+- Ética e Transparência – Integridade e conformidade nas relações empresariais
+- Inovação – Busca contínua por tecnologias e estratégias modernas
+- Compromisso com o Cliente – Foco em entender e atender necessidades específicas
+- Sustentabilidade – Promoção de práticas empresariais responsáveis
+- Desenvolvimento e Crescimento – Valorização do conhecimento e aprimoramento profissional
 
 ═══════════════════════════════════════════════════════════════════
 💼 SERVIÇOS OFERECIDOS
@@ -163,12 +171,12 @@ Ser reconhecida como referência em consultoria e gestão empresarial em Moçamb
 💰 INFORMAÇÕES SOBRE HONORÁRIOS
 ═══════════════════════════════════════════════════════════════════
 
-• Honorários mensais em USD para serviços recorrentes
-• Pareceres Fiscais e de Auditoria: De acordo com horas previamente acordadas
-• Taxas horárias diferenciadas por nível (Partner, Senior Manager, Senior Consultant)
-• Faturas emitidas mensalmente em Meticais (câmbio BCI na data de emissão)
-• IVA não incluído nos valores apresentados
-• Despesas reembolsáveis (deslocação, alimentação, alojamento) faturadas ao custo real com aprovação prévia
+- Honorários mensais em USD para serviços recorrentes
+- Pareceres Fiscais e de Auditoria: De acordo com horas previamente acordadas
+- Taxas horárias diferenciadas por nível (Partner, Senior Manager, Senior Consultant)
+- Faturas emitidas mensalmente em Meticais (câmbio BCI na data de emissão)
+- IVA não incluído nos valores apresentados
+- Despesas reembolsáveis (deslocação, alimentação, alojamento) faturadas ao custo real com aprovação prévia
 
 NOTA: Para valores específicos, solicite orçamento personalizado através dos nossos contactos.
 
@@ -202,10 +210,10 @@ Horário de Atendimento: Segunda a Sexta, 08h00 - 17h00
 ═══════════════════════════════════════════════════════════════════
 
 PERSONALIDADE:
-• Profissional, educado e extremamente prestativo
-• Tom consultivo e orientado a soluções
-• Linguagem clara e objetiva em Português de Moçambique
-• Empático com as necessidades do cliente
+- Profissional, educado e extremamente prestativo
+- Tom consultivo e orientado a soluções
+- Linguagem clara e objetiva em Português de Moçambique
+- Empático com as necessidades do cliente
 
 DIRETRIZES DE RESPOSTA:
 ✓ Respostas concisas (2-3 parágrafos máximo)
@@ -222,11 +230,11 @@ Se perguntarem algo não coberto pelas informações acima, responda:
 Eles poderão fornecer detalhes personalizados para sua situação."
 
 GATILHOS PARA AÇÃO:
-• Se perguntarem sobre preços → Explique estrutura geral + ofereça orçamento personalizado
-• Se mostrarem interesse → Sugira agendar reunião ou consulta
-• Se tiverem dúvida técnica → Explique de forma simples + ofereça suporte especializado
-• Se perguntarem sobre prazos → Mencione obrigações fiscais específicas
-• Se pedirem documentação → Explique processo + documentos necessários
+- Se perguntarem sobre preços → Explique estrutura geral + ofereça orçamento personalizado
+- Se mostrarem interesse → Sugira agendar reunião ou consulta
+- Se tiverem dúvida técnica → Explique de forma simples + ofereça suporte especializado
+- Se perguntarem sobre prazos → Mencione obrigações fiscais específicas
+- Se pedirem documentação → Explique processo + documentos necessários
 
 EXEMPLOS DE RESPOSTAS IDEAIS:
 "Olá! 👋 A Horizon oferece consultoria fiscal completa, incluindo análise mensal de IRPC, IVA, IRPS e Segurança Social. Cuidamos de todas as declarações e garantimos conformidade total com a legislação moçambicana. Gostaria de saber mais sobre algum imposto específico?"
@@ -248,9 +256,11 @@ SEMPRE:
 
 Você representa uma empresa de excelência. Cada interação deve refletir profissionalismo, conhecimento técnico e compromisso genuíno com o sucesso do cliente."""
 
-            # ✅ REQUISIÇÃO À API COM CONFIGURAÇÕES OTIMIZADAS
+            # ✅ REQUISIÇÃO À API COM MELHOR TRATAMENTO DE ERROS
             async with httpx.AsyncClient(timeout=120.0) as client:
                 try:
+                    print(f"🔄 Fazendo requisição à API...")
+                    
                     async with client.stream(
                         "POST",
                         "https://openrouter.ai/api/v1/chat/completions",
@@ -263,10 +273,7 @@ Você representa uma empresa de excelência. Cada interação deve refletir prof
                         json={
                             "model": "openai/gpt-3.5-turbo",
                             "messages": [
-                                {
-                                    "role": "system",
-                                    "content": system_prompt
-                                },
+                                {"role": "system", "content": system_prompt},
                                 {
                                     "role": "user",
                                     "content": content_array if len(content_array) > 1 else user_message
@@ -281,14 +288,26 @@ Você representa uma empresa de excelência. Cada interação deve refletir prof
                     ) as response:
                         # Verifica status da resposta
                         if response.status_code != 200:
-                            raise Exception(f"API retornou status {response.status_code}")
+                            error_body = await response.aread()
+                            error_text = error_body.decode('utf-8')
+                            print(f"❌ ERRO API {response.status_code}: {error_text}")
+                            
+                            await self.send(json.dumps({
+                                "event": "error",
+                                "message": f"Desculpe, estou com dificuldades no momento. Tente novamente."
+                            }))
+                            await self.send(json.dumps({"event": "typing", "status": False}))
+                            return
 
+                        print(f"✅ API respondeu com status 200")
+                        
                         # Processa streaming de tokens
                         async for line in response.aiter_lines():
                             if line.startswith("data: "):
                                 line = line[6:]
                                 
                                 if line.strip() == "[DONE]":
+                                    print("✅ Stream finalizado")
                                     break
                                 
                                 try:
@@ -305,27 +324,39 @@ Você representa uma empresa de excelência. Cada interação deve refletir prof
                                     continue
 
                 except httpx.TimeoutException:
+                    print("⏱️ ERRO: Timeout na requisição")
                     await self.send(json.dumps({
                         "event": "error",
                         "message": "⏱️ Tempo limite excedido. Por favor, tente novamente."
                     }))
+                    await self.send(json.dumps({"event": "typing", "status": False}))
                     return
-                except httpx.ConnectError:
+                    
+                except httpx.ConnectError as e:
+                    print(f"🔌 ERRO: Falha de conexão - {str(e)}")
                     await self.send(json.dumps({
                         "event": "error",
                         "message": "🔌 Erro de conexão. Verifique sua internet e tente novamente."
                     }))
+                    await self.send(json.dumps({"event": "typing", "status": False}))
                     return
+                
+                except Exception as e:
+                    print(f"❌ ERRO durante stream: {str(e)}")
+                    print(traceback.format_exc())
+                    raise
 
             # Finaliza corretamente
             await self.send(json.dumps({"event": "done"}))
             await self.send(json.dumps({"event": "typing", "status": False}))
+            print("✅ Resposta enviada com sucesso")
 
         except Exception as e:
+            error_trace = traceback.format_exc()
+            print(f"❌ ERRO CRÍTICO NO CONSUMER:\n{error_trace}")
+            
             await self.send(json.dumps({
                 "event": "error",
-                "message": "❌ Erro ao processar mensagem. Nossa equipe foi notificada."
+                "message": "Desculpe, ocorreu um erro inesperado. Nossa equipe foi notificada. Por favor, tente novamente ou entre em contato."
             }))
             await self.send(json.dumps({"event": "typing", "status": False}))
-            # Log do erro para debugging
-            print(f"Erro no ChatConsumer: {str(e)}")
